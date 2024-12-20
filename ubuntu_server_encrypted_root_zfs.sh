@@ -2266,7 +2266,9 @@ initialinstall(){
 	getdiskID_pool "root"
 	ipv6_apt_live_iso_fix #Only active if ipv6_apt_fix_live_iso variable is set to "yes".
 
-	debootstrap_part1_Func
+	apt install efibootmgr
+ 
+ 	debootstrap_part1_Func
 	debootstrap_createzfspools_Func
 	debootstrap_installminsys_Func
 	systemsetupFunc_part1 #Basic system configuration.
