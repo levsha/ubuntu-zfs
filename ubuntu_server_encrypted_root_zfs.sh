@@ -40,19 +40,19 @@ set -euo pipefail
 ##Variables:
 ubuntuver="noble" #Ubuntu release to install. "jammy" (22.04). "noble" (24.04).
 distro_variant="server" #Ubuntu variant to install. "server" (Ubuntu server; cli only.) "desktop" (Default Ubuntu desktop install). "kubuntu" (KDE plasma desktop variant). "xubuntu" (Xfce desktop variant). "budgie" (Budgie desktop variant). "MATE" (MATE desktop variant).
-user="testuser" #Username for new install.
-PASSWORD="testuser" #Password for user in new install.
+user="superuser" #Username for new install.
+PASSWORD="$ROOTPWD" #Password for user in new install.
 hostname="ubuntu" #Name to identify the main system on the network. An underscore is DNS non-compliant.
-zfs_root_password="testtest" #Password for encrypted root pool. Minimum 8 characters. "" for no password encrypted protection. Unlocking root pool also unlocks data pool, unless the root pool has no password protection, then a separate data pool password can be set below.
+zfs_root_password="$ZFSPWD" #Password for encrypted root pool. Minimum 8 characters. "" for no password encrypted protection. Unlocking root pool also unlocks data pool, unless the root pool has no password protection, then a separate data pool password can be set below.
 zfs_root_encrypt="native" #Encryption type. "native" for native zfs encryption. "luks" for luks. Required if there is a root pool password, otherwise ignored.
 locale="en_GB.UTF-8" #New install language setting.
-timezone="Europe/London" #New install timezone setting.
+timezone="UTC" #New install timezone setting.
 zfs_rpool_ashift="12" #Drive setting for zfs pool. ashift=9 means 512B sectors (used by all ancient drives), ashift=12 means 4KiB sectors (used by most modern hard drives), and ashift=13 means 8KiB sectors (used by some modern SSDs).
 mirror_archive="" #"" to use the default ubuntu repository. Set to an ISO 3166-1 alpha-2 country code to use a country mirror archive, e.g. "GB". A speed test is run and the fastest archive is selected. Country codes: https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
 
 RPOOL="rpool" #Root pool name.
-topology_root="single" #"single", "mirror", "raid0", "raidz1", "raidz2", or "raidz3" topology on root pool.
-disks_root="1" #Number of disks in array for root pool. Not used with single topology.
+topology_root="mirror" #"single", "mirror", "raid0", "raidz1", "raidz2", or "raidz3" topology on root pool.
+disks_root="2" #Number of disks in array for root pool. Not used with single topology.
 EFI_boot_size="512" #EFI boot loader partition size in mebibytes (MiB).
 swap_size="500" #Swap partition size in mebibytes (MiB). Size of swap will be larger than defined here with Raidz topologies.
 datapool="datapool" #Non-root drive data pool name.
@@ -68,7 +68,7 @@ remoteaccess_first_boot="no" #"yes" to enable remoteaccess during first boot. Re
 timeout_rEFInd="3" #Timeout in seconds for rEFInd boot screen until default choice selected.
 timeout_zbm_no_remote_access="3" #Timeout in seconds for zfsbootmenu when no remote access enabled.
 timeout_zbm_remote_access="45" #Timeout in seconds for zfsbootmenu when remote access enabled. The password prompt for an encrypted root pool with allow an indefinite time to connect. An unencrypted root pool will boot the system when the timer runs out, preventing remote access.
-quiet_boot="yes" #Set to "no" to show boot sequence.
+quiet_boot="no" #Set to "no" to show boot sequence.
 ethprefix="e" #First letter of ethernet interface. Used to identify ethernet interface to setup networking in new install.
 install_log="ubuntu_setup_zfs_root.log" #Installation log filename.
 log_loc="/var/log" #Installation log location.
@@ -109,9 +109,9 @@ fi
 ##Functions
 live_desktop_check(){
 	##Check for live desktop environment
-	if [ "$(dpkg -l ubuntu-desktop)" ];
+	if [ "$(dpkg -l ubuntu-server)" ];
 	then
-		echo "Desktop environment test passed."
+		echo "Server environment test passed."
 		if grep casper /proc/cmdline >/dev/null 2>&1;
 		then
 			echo "Live environment present."
